@@ -1,14 +1,20 @@
 const express = require("express")
 const path = require('path')
-const { connecttoMongoDB } = require('./connect')
+// const { connecttoMongoDB } = require('./connect')
 const urlroute = require('./routes/url')
 const staticRouter = require('./routes/staticRouter')
 const URL = require('./models/url')
+const  mongoose  = require("mongoose")
 const app = express();
-const PORT = 2222;
+require('dotenv').config()
 
-connecttoMongoDB('mongodb://localhost:27017/short-url')
-    .then(() => console.log('mongoDb Connected'));
+const url = process.env.URL;
+const port = process.env.PORT;
+
+mongoose
+.connect(url)
+.then(() => console.log('mongoDb Connected'))
+.catch((err)=>console.log(err));
 
 app.set("view engine", "ejs");
 app.set('views', path.resolve('./views'))
@@ -30,8 +36,8 @@ app.get('/url/:shortId', async (req, res) => {
                 visitHistory: new Date(),
             },
         })
-        res.render('index', { id: generatedId, urls: urlList });
-    // res.redirect(entry.redirectURL)
+        // res.render('index', { id: generatedId, urls: urlList });
+    res.redirect(entry.redirectURL)
 })
 
-app.listen(PORT, () => console.log(`server Started at PORT:${PORT}`))
+app.listen(port, () => console.log(`server Started at PORT:${port}`))
